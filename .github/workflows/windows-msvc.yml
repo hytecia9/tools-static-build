@@ -19,6 +19,8 @@ permissions:
 jobs:
   windows-msvc-x86:
     runs-on: windows-2025
+    env:
+      WINDOWS_MSVC_BASE_IMAGE: mcr.microsoft.com/dotnet/framework/runtime:4.8.1-windowsservercore-ltsc2025
 
     steps:
       - name: Enable long paths
@@ -34,11 +36,11 @@ jobs:
 
       - name: Prepare Windows container base image
         shell: pwsh
-        run: docker pull mcr.microsoft.com/dotnet/framework/runtime:4.8.1-windowsservercore-ltsc2025
+        run: docker pull $env:WINDOWS_MSVC_BASE_IMAGE
 
       - name: Configure
         shell: pwsh
-        run: cmake -S . -B build -DTSB_WINDOWS_CONTAINER_ISOLATION=process -DTSB_WINDOWS_MSVC_BASE_IMAGE=mcr.microsoft.com/dotnet/framework/runtime:4.8.1-windowsservercore-ltsc2025
+        run: cmake -S . -B build -DTSB_WINDOWS_CONTAINER_ISOLATION=process "-DTSB_WINDOWS_MSVC_BASE_IMAGE=$env:WINDOWS_MSVC_BASE_IMAGE"
 
       - name: Build Windows MSVC targets
         shell: pwsh
