@@ -38,16 +38,29 @@ jobs:
           path: dockcross-verified-artifacts.tar.gz
           if-no-files-found: error
 
+  windows-msvc-release-build:
+    uses: ./.github/workflows/windows-msvc.yml
+    with:
+      release_tag: ''
+
   publish-release:
     runs-on: ubuntu-latest
     needs:
       - dockcross-release-build
+      - windows-msvc-release-build
+    if: ${{ always() && needs.dockcross-release-build.result == 'success' && needs.windows-msvc-release-build.result == 'success' }}
 
     steps:
       - name: Download packaged artifacts
         uses: actions/download-artifact@v4
         with:
           name: dockcross-release-artifacts
+          path: release
+
+      - name: Download Windows MSVC artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-msvc-x86-artifacts
           path: release
 
       - name: Resolve release tag
@@ -66,3 +79,9 @@ jobs:
           tag_name: ${{ steps.meta.outputs.tag }}
           files: release/dockcross-verified-artifacts.tar.gz
           generate_release_notes: true
+
+      - name: Attach Windows MSVC archive
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          files: release/windows-msvc-x86-artifacts.zip

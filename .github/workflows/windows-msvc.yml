@@ -1,10 +1,15 @@
 name: windows-msvc-build
 
 on:
+  workflow_call:
+    inputs:
+      release_tag:
+        required: false
+        type: string
   workflow_dispatch:
     inputs:
       release_tag:
-        description: Existing release tag to attach the Windows MSVC archive to
+        description: Optional existing release tag to attach the Windows MSVC archive to; leave empty to only upload the workflow artifact
         required: false
         type: string
 
@@ -13,19 +18,19 @@ permissions:
 
 jobs:
   windows-msvc-x86:
-    runs-on:
-      - self-hosted
-      - windows
-      - x64
-      - docker-windows
+    runs-on: windows-2022
 
     steps:
+      - name: Enable long paths
+        shell: pwsh
+        run: git config --global core.longpaths true
+
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Configure
         shell: pwsh
-        run: cmake -S . -B build
+        run: cmake -S . -B build -DTSB_WINDOWS_CONTAINER_ISOLATION=process
 
       - name: Build Windows MSVC targets
         shell: pwsh
