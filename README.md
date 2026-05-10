@@ -183,8 +183,8 @@ These targets are still part of `full-matrix`, but are not part of the verified 
 ## GitHub Actions
 
 - `.github/workflows/build.yml`: builds the current `all-static` dockcross subset on `ubuntu-latest` and uploads a compressed artifact bundle
-- `.github/workflows/release.yml`: rebuilds the dockcross verified subset on `ubuntu-latest`, builds the Windows MSVC x86 archive on `windows-2022`, and publishes both assets to the same GitHub release for tags or manual release runs
+- `.github/workflows/release.yml`: rebuilds the dockcross verified subset on `ubuntu-latest`, builds the Windows MSVC x86 archive on `windows-2025`, and publishes both assets to the same GitHub release for tags or manual release runs
 - `.github/workflows/windows-msvc.yml`: standalone Windows MSVC workflow for ad-hoc runs, and also the reusable workflow called by `release.yml`
 
-The release workflow now uses GitHub-hosted runners for both halves: Ubuntu for dockcross builds and Windows 2022 with process-isolated Windows containers for the MSVC subset.
+The release workflow now uses GitHub-hosted runners for both halves: Ubuntu for dockcross builds and Windows 2025 with process-isolated LTSC 2025 Windows containers for the MSVC subset.
 

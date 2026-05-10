@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   windows-msvc-x86:
-    runs-on: windows-2022
+    runs-on: windows-2025
 
     steps:
       - name: Enable long paths
@@ -28,9 +28,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Check Docker availability
+        shell: pwsh
+        run: docker version
+
+      - name: Prepare Windows container base image
+        shell: pwsh
+        run: docker pull mcr.microsoft.com/dotnet/framework/runtime:4.8.1-windowsservercore-ltsc2025
+
       - name: Configure
         shell: pwsh
-        run: cmake -S . -B build -DTSB_WINDOWS_CONTAINER_ISOLATION=process
+        run: cmake -S . -B build -DTSB_WINDOWS_CONTAINER_ISOLATION=process -DTSB_WINDOWS_MSVC_BASE_IMAGE=mcr.microsoft.com/dotnet/framework/runtime:4.8.1-windowsservercore-ltsc2025
 
       - name: Build Windows MSVC targets
         shell: pwsh
