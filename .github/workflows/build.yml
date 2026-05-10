@@ -1,0 +1,35 @@
+name: build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dockcross-verified:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -S . -B build
+
+      - name: Build verified subset
+        run: cmake --build build --target all-static --config Release
+
+      - name: Package artifacts
+        run: tar -C artifacts -czf dockcross-verified-artifacts.tar.gz .
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dockcross-verified-artifacts
+          path: dockcross-verified-artifacts.tar.gz
+          if-no-files-found: error

@@ -1,0 +1,50 @@
+name: windows-msvc-build
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing release tag to attach the Windows MSVC archive to
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  windows-msvc-x86:
+    runs-on:
+      - self-hosted
+      - windows
+      - x64
+      - docker-windows
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure
+        shell: pwsh
+        run: cmake -S . -B build
+
+      - name: Build Windows MSVC targets
+        shell: pwsh
+        run: cmake --build build --target ncat-windows-msvc-x86 nmap-windows-msvc-x86 --config Release
+
+      - name: Package artifacts
+        shell: pwsh
+        run: Compress-Archive -Path artifacts\ncat\windows-msvc-x86,artifacts\nmap\windows-msvc-x86 -DestinationPath windows-msvc-x86-artifacts.zip -Force
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-msvc-x86-artifacts
+          path: windows-msvc-x86-artifacts.zip
+          if-no-files-found: error
+
+      - name: Attach archive to release
+        if: ${{ inputs.release_tag != '' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.release_tag }}
+          files: windows-msvc-x86-artifacts.zip
